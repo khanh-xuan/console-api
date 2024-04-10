@@ -20,6 +20,10 @@ namespace ConsoleApi
     {
         private static readonly ILog _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        private static string enableBeFood = ConfigurationManager.AppSettings["EnableBeFood"];
+        private static string enableShopeeFood = ConfigurationManager.AppSettings["EnableShopeeFood"];
+
+
         private static int periodicItem = int.Parse(ConfigurationManager.AppSettings["PeriodicItem"]);
         private static int shopeeFoodRange = int.Parse(ConfigurationManager.AppSettings["ShopeeFoodRange"]);
         private static int maxJsonFileLength = int.Parse(ConfigurationManager.AppSettings["MaxJsonFileLength"]);
@@ -33,6 +37,8 @@ namespace ConsoleApi
         private static string urlBeFoodGetRestaurantInfo = ConfigurationManager.AppSettings["BeFoodGetRestaurantInfoUrl"];
         private static string beFoodFolderJson = ConfigurationManager.AppSettings["BeFoodFolderJson"];
         private static string beFoodFolderExcel = ConfigurationManager.AppSettings["BeFoodFolderExcel"];
+        private static string beFoodFilePathJson = $"{beFoodFolderJson}\\befood-{BeFoodMinId}-{BeFoodMaxId}-{DateTime.Now.ToString("ddMMyyyyHHmmss")}.json";
+
         //ShopeeFood
         private static List<ShopeeFoodRestaurantInfo> listShopeeFoodRestaurantInfor = new List<ShopeeFoodRestaurantInfo>();
         private static string urlShopeeFoodGetRestaurantInfo = ConfigurationManager.AppSettings["ShopeeGetRestaurantInfoUrl"];
@@ -40,16 +46,19 @@ namespace ConsoleApi
         private static int shopeeMaxId = int.Parse(ConfigurationManager.AppSettings["ShopeeFoodMaxId"]);
         private static string shopeeFoodFolderJson = ConfigurationManager.AppSettings["ShopeeFoodFolderJson"];
         private static string shopeeFoodFolderExcel = ConfigurationManager.AppSettings["ShopeeFoodFolderExcel"];
-
-
-        private static string beFoodFilePathJson = $"{beFoodFolderJson}\\befood-{BeFoodMinId}-{BeFoodMaxId}-{DateTime.Now.ToString("ddMMyyyyHHmmss")}.json";
         private static string shopeeFoodFilePathJson = $"{shopeeFoodFolderJson}\\shopeefood-{shopeeMinId}-{shopeeMaxId}-{DateTime.Now.ToString("ddMMyyyyHHmmss")}.json";
 
         static void Main(string[] args)
         {
             Console.WriteLine("--------------Start----------------");
-            GetBeFood();
-            //GetShopeeFood();
+            if(enableBeFood.Equals("1"))
+            {
+                GetBeFood();
+            }
+            if (enableShopeeFood.Equals("1"))
+            {
+                GetShopeeFood();
+            }
             Console.Read();
         }
 
@@ -82,21 +91,47 @@ namespace ConsoleApi
                             //int sleep = rnd.Next(1000, 2000);
                             //Console.WriteLine($"Sleep {sleep}s + {i}");
                             //Thread.Sleep(sleep);
-                            string restaurant = BeFood.GetRestaurantInfo(urlBeFoodGetRestaurantInfo, token.Access_Token, i.ToString());
-                            if (restaurant != null)
+                            string restaurant = string.Empty;
+                            try
                             {
-                                Console.WriteLine("----------Get RestaurantInfor ID : " + i + "Success");
-                                var restaurantJson = JsonConvert.DeserializeObject<BeFoodRestaurantResult>(restaurant);
-                                if (restaurantJson.Data != null)
+                                restaurant = BeFood.GetRestaurantInfo(urlBeFoodGetRestaurantInfo, token.Access_Token, i.ToString());
+                                if (restaurant != null)
                                 {
-                                    listBeFoodRestaurant.Add(restaurantJson.Data);
-                                    listBeFoodRestaurantInfor.Add(restaurantJson.Data.Restaurant_Info);
-                                    success++;
+                                    Console.WriteLine("----------Get RestaurantInfor ID : " + i + "Success");
+                                    var restaurantJson = JsonConvert.DeserializeObject<BeFoodRestaurantResult>(restaurant);
+                                    if (restaurantJson.Data != null)
+                                    {
+                                        listBeFoodRestaurant.Add(restaurantJson.Data);
+                                        listBeFoodRestaurantInfor.Add(restaurantJson.Data.Restaurant_Info);
+                                        success++;
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("----------Get RestaurantInfor ID : " + i + "Fail");
+                                    accessToken = BeFood.GetAccessToken(urlBeFoodGetToken);
+                                    if (accessToken != null)
+                                    {
+                                        Console.WriteLine($"Refresh AccessToken Success : {accessToken}");
+                                        token = JsonConvert.DeserializeObject<AccessToken>(accessToken);
+                                        restaurant = BeFood.GetRestaurantInfo(urlBeFoodGetRestaurantInfo, token.Access_Token, i.ToString());
+                                        if (restaurant != null)
+                                        {
+                                            Console.WriteLine("----------Get RestaurantInfor ID : " + i + "Success");
+                                            var restaurantJson = JsonConvert.DeserializeObject<BeFoodRestaurantResult>(restaurant);
+                                            if (restaurantJson.Data != null)
+                                            {
+                                                listBeFoodRestaurant.Add(restaurantJson.Data);
+                                                listBeFoodRestaurantInfor.Add(restaurantJson.Data.Restaurant_Info);
+                                                success++;
+                                            }
+                                        }
+                                    }
                                 }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                Console.WriteLine("----------Get RestaurantInfor ID : " + i + "Fail");
+                                _logger.Error(ex.Message);
                                 accessToken = BeFood.GetAccessToken(urlBeFoodGetToken);
                                 if (accessToken != null)
                                 {
@@ -116,6 +151,7 @@ namespace ConsoleApi
                                     }
                                 }
                             }
+
 
                             if (i % periodicItem == 0)
                             {
@@ -171,12 +207,14 @@ namespace ConsoleApi
                                 listShopeeFoodRestaurantInfor.AddRange(restaurantJson.reply.delivery_infos);
 
                                 // write data to json file
-                                CreateShopeeFoodJson(shopeeFoodFilePathJson,i);
+                                CreateShopeeFoodJson(shopeeFoodFilePathJson, i);
                                 // write data to excel file
                                 CreateShopeeFoodExcel(filePathExcel);
                                 listShopeeFoodRestaurantInfor = new List<ShopeeFoodRestaurantInfo>();
                                 success += restaurantJson.reply.delivery_infos.Count;
                             }
+                            Console.WriteLine($"----------Get RestaurantInfor ID : {i} - {i + shopeeFoodRange} Success");
+
                         }
                     }
                     Console.WriteLine("GetRestaurantInfo Success! Count: " + success);
