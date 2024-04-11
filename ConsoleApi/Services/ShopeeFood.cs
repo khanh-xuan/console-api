@@ -15,7 +15,7 @@ namespace ConsoleApi.Services
     {
         private static readonly ILog _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
-        public static string GetRestaurantInfo(string url, List<int> restaurant_ids)
+        public static string GetRestaurantInfo(string url, List<double> restaurant_ids)
         {
             try
             {

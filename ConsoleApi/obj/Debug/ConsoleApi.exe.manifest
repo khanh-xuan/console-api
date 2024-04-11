@@ -49,7 +49,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>1UIAWhxffisFKoSHHPWA5eHYkYbv/eUeRd1tqGXeyuw=</dsig:DigestValue>
+        <dsig:DigestValue>V9665Huxe5eawUkp3WgEv9i0wKDnoGDE0+Olp53Jews=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -185,13 +185,13 @@
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="ConsoleApi.exe.config" size="2378">
+  <file name="ConsoleApi.exe.config" size="2394">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>UPs+Q89icFBB1PdfAjAaooKfhIlreXMb0jA9xFIn9oY=</dsig:DigestValue>
+      <dsig:DigestValue>1mIIkcP+JpNO2F8wxFNKIQmW9sqSweuNvPfwkN2CWNw=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>

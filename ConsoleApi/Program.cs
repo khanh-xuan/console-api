@@ -24,15 +24,15 @@ namespace ConsoleApi
         private static string enableShopeeFood = ConfigurationManager.AppSettings["EnableShopeeFood"];
 
 
-        private static int periodicItem = int.Parse(ConfigurationManager.AppSettings["PeriodicItem"]);
-        private static int shopeeFoodRange = int.Parse(ConfigurationManager.AppSettings["ShopeeFoodRange"]);
-        private static int maxJsonFileLength = int.Parse(ConfigurationManager.AppSettings["MaxJsonFileLength"]);
+        private static double periodicItem = double.Parse(ConfigurationManager.AppSettings["PeriodicItem"]);
+        private static double shopeeFoodRange = double.Parse(ConfigurationManager.AppSettings["ShopeeFoodRange"]);
+        private static double maxJsonFileLength = double.Parse(ConfigurationManager.AppSettings["MaxJsonFileLength"]);
 
         //BeFood
         private static List<BeFoodRestaurant> listBeFoodRestaurant = new List<BeFoodRestaurant>();
         private static List<BeFoodRestaurantInfo> listBeFoodRestaurantInfor = new List<BeFoodRestaurantInfo>();
-        private static int BeFoodMinId = int.Parse(ConfigurationManager.AppSettings["BeFoodMinId"]);
-        private static int BeFoodMaxId = int.Parse(ConfigurationManager.AppSettings["BeFoodMaxId"]);
+        private static double BeFoodMinId = double.Parse(ConfigurationManager.AppSettings["BeFoodMinId"]);
+        private static double BeFoodMaxId = double.Parse(ConfigurationManager.AppSettings["BeFoodMaxId"]);
         private static string urlBeFoodGetToken = ConfigurationManager.AppSettings["BeFoodGetTokenUrl"];
         private static string urlBeFoodGetRestaurantInfo = ConfigurationManager.AppSettings["BeFoodGetRestaurantInfoUrl"];
         private static string beFoodFolderJson = ConfigurationManager.AppSettings["BeFoodFolderJson"];
@@ -42,8 +42,8 @@ namespace ConsoleApi
         //ShopeeFood
         private static List<ShopeeFoodRestaurantInfo> listShopeeFoodRestaurantInfor = new List<ShopeeFoodRestaurantInfo>();
         private static string urlShopeeFoodGetRestaurantInfo = ConfigurationManager.AppSettings["ShopeeGetRestaurantInfoUrl"];
-        private static int shopeeMinId = int.Parse(ConfigurationManager.AppSettings["ShopeeFoodMinId"]);
-        private static int shopeeMaxId = int.Parse(ConfigurationManager.AppSettings["ShopeeFoodMaxId"]);
+        private static long shopeeMinId = long.Parse(ConfigurationManager.AppSettings["ShopeeFoodMinId"]);
+        private static long shopeeMaxId = long.Parse(ConfigurationManager.AppSettings["ShopeeFoodMaxId"]);
         private static string shopeeFoodFolderJson = ConfigurationManager.AppSettings["ShopeeFoodFolderJson"];
         private static string shopeeFoodFolderExcel = ConfigurationManager.AppSettings["ShopeeFoodFolderExcel"];
         private static string shopeeFoodFilePathJson = $"{shopeeFoodFolderJson}\\shopeefood-{shopeeMinId}-{shopeeMaxId}-{DateTime.Now.ToString("ddMMyyyyHHmmss")}.json";
@@ -86,7 +86,7 @@ namespace ConsoleApi
                         Console.WriteLine("----------GetRestaurantInfo------------");
                         //Random rnd = new Random();
 
-                        for (int i = BeFoodMinId; i <= BeFoodMaxId; i++)
+                        for (double i = BeFoodMinId; i <= BeFoodMaxId; i++)
                         {
                             //int sleep = rnd.Next(1000, 2000);
                             //Console.WriteLine($"Sleep {sleep}s + {i}");
@@ -191,9 +191,9 @@ namespace ConsoleApi
                     string filePathExcel = $"{shopeeFoodFolderExcel}\\shopeefood-{shopeeMinId}-{shopeeMaxId}-{DateTime.Now.ToString("ddMMyyyyHHmmss")}.xlsx";
                     Excel.CreateBeFoodXlsx(filePathExcel);
                     int success = 0;
-                    for (int i = shopeeMinId; i <= shopeeMaxId; i += shopeeFoodRange)
+                    for (double i = shopeeMinId; i <= shopeeMaxId; i += shopeeFoodRange)
                     {
-                        var payload = new List<int>(i);
+                        var payload = new List<double>();
                         for (int j = 0; j < shopeeFoodRange; j++)
                         {
                             payload.Add(j + i);
@@ -246,7 +246,7 @@ namespace ConsoleApi
             File.WriteAllBytes(filePathExcel, bytes);
             listBeFoodRestaurantInfor = new List<BeFoodRestaurantInfo>();
         }
-        static void CreateBeFoodJson(string filePathJson, int currentId)
+        static void CreateBeFoodJson(string filePathJson, double currentId)
         {
             long length = new FileInfo(filePathJson).Length;
             if (length >= maxJsonFileLength * 1024)
@@ -287,7 +287,7 @@ namespace ConsoleApi
             File.WriteAllBytes(filePathExcel, bytes);
             listBeFoodRestaurantInfor = new List<BeFoodRestaurantInfo>();
         }
-        static void CreateShopeeFoodJson(string filePathJson, int currentId)
+        static void CreateShopeeFoodJson(string filePathJson, double currentId)
         {
             long length = new FileInfo(filePathJson).Length;
             if (length >= maxJsonFileLength * 1024)
